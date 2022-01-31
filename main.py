@@ -51,8 +51,8 @@ async def add_alias(bot,ev):
     with open(os.path.join(os.path.dirname(__file__),'alias.json'),'w',encoding='utf8') as f:
         alias_data = set(data[valkyrie])
         alias_data.add(alias)
-        data.update(alias_data)
-        json.dump(data,f)
+        data.update({valkyrie:list(alias_data)})
+        json.dump(data,f,ensure_ascii=False,indent=4)
     await bot.send(ev,f"{valkyrie}别名:{alias}更新完成。\n当前记录的别名如下\n{alias_data}")
 
 if __name__ == '__main__':
