@@ -32,7 +32,7 @@ async def show_buff(bot, ev):
     except KeyError as e:
         await bot.send(ev, f"{e}\n如果确定没输错,请联系管理员添加别名.")
         return
-    # ms = MessageSegment.text("没正式更新")
+    ms = MessageSegment.text("未更新")
     select_im = []
     for im in os.listdir(os.path.join(os.path.dirname(__file__), "image")):
         if im.startswith(valkyrie):
@@ -40,8 +40,12 @@ async def show_buff(bot, ev):
     images = MessageSegment.text("")
     for im in select_im:
         images = images + MessageSegment.image(f"file:///{im}")
-    await bot.send(ev, images)
-    return
+    ctime = os.path.getctime(select_im[0])
+    if ctime < 1657763146:
+        await bot.send(ev, images+ms)
+    else:
+        await bot.send(ev,images)
+        return
 
 
 @sv.on_prefix("刻印别名添加")

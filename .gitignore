@@ -151,15 +151,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 .vscode
-config.json
-data/*
-example.db
-config.yaml
-test.py
-assets/AvatarCardFigures/*
-assets/AvatarCardIcons/*
-assets/AvatarIcon/*
-assets/ElfCardIcons/*
-assets/QuestBossIcon/*
-assets/StigmataIcons/*
-assets/WeaponIcons/*
+image/*
+record.txt
