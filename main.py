@@ -2,8 +2,9 @@ import datetime
 import json
 import os
 import re
+from datetime import date, timedelta
 
-from hoshino import Service, priv, typing
+from hoshino import Service, priv, typing, R
 from nonebot import MessageSegment
 
 sv = Service("刻印", enable_on_default=True, visible=True)
@@ -22,6 +23,21 @@ def trans_alias(alias) -> str:
     raise KeyError(f"没有找到{alias}的数据，请检查输入")
 
 
+def check_aliasfile():
+    """检查alias.json文件是否存在,不存在则复制alias_template.json内容并新建alias.json"""
+    if not os.path.exists(os.path.join(os.path.dirname(__file__), "alias.json")):
+        with open(
+            os.path.join(os.path.dirname(__file__), "alias_template.json"),
+            "r",
+            encoding="utf8",
+        ) as f:
+            data = json.load(f)
+        with open(
+            os.path.join(os.path.dirname(__file__), "alias.json"), "w", encoding="utf8"
+        ) as f:
+            json.dump(data, f, indent=4)
+
+
 @sv.on_prefix(("刻印"))
 async def show_buff(bot, ev):
     msg = ev.message.extract_plain_text().strip()
@@ -32,20 +48,19 @@ async def show_buff(bot, ev):
     except KeyError as e:
         await bot.send(ev, f"{e}\n如果确定没输错,请联系管理员添加别名.")
         return
-    ms = MessageSegment.text("未更新")
     select_im = []
-    for im in os.listdir(os.path.join(os.path.dirname(__file__), "image")):
+    imgPath = R.img("ElysianRealm/").path
+    for im in os.listdir(imgPath):
         if im.startswith(valkyrie):
-            select_im.append(os.path.join(os.path.dirname(__file__), "image", im))
+            select_im.append(im)
     images = MessageSegment.text("")
     for im in select_im:
-        images = images + MessageSegment.image(f"file:///{im}")
-    ctime = os.path.getctime(select_im[0])
-    if ctime < 1657763146:
-        await bot.send(ev, images+ms)
-    else:
-        await bot.send(ev,images)
-        return
+        images = images + R.img("ElysianRealm/", im).cqcode
+    ctime = os.path.getmtime(R.img("ElysianRealm/", select_im[0]).path)
+    ct = date.fromtimestamp(ctime)
+    tt = date.today() - ct
+    msg = "过时的攻略" if tt > timedelta(60) else ""
+    await bot.send(ev, MessageSegment.text(f"{ct}更新{msg}") + images)
 
 
 @sv.on_prefix("刻印别名添加")
@@ -55,7 +70,7 @@ async def add_alias(bot, ev: typing.CQEvent):
     msg = str(ev.message.extract_plain_text())
     try:
         valkyrie, alias = re.split(":|：", msg)
-    except:
+    except IndexError:
         return
     try:
         valkyrie = trans_alias(valkyrie)
