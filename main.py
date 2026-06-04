@@ -98,7 +98,7 @@ def find_valkyrie_images(valkyrie: str):
 
     selected = find_images_in_dir(img_root, img_root, valkyrie)
     if selected:
-        return "根目录", selected
+        return "过时的版本", selected
     return "", []
 
 
