@@ -154,3 +154,5 @@ cython_debug/
 alias.json
 image/
 record.txt
+data/
+log/
